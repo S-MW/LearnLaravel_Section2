@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Todo;
+
+use function PHPUnit\Framework\returnValueMap;
 
 class TodoListController extends Controller
 {
@@ -13,7 +16,10 @@ class TodoListController extends Controller
      */
     public function index()
     {
-        dd('d');
+        $todoList = Todo::orderBy('created_at','desc')->get();
+        
+        return view('index',compact('todoList') );
+        
     }
 
     /**
@@ -23,7 +29,7 @@ class TodoListController extends Controller
      */
     public function create()
     {
-        //
+        return view('create');
     }
 
     /**
@@ -34,7 +40,15 @@ class TodoListController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $valadter = $request->validate([
+            'title'=>'required',
+            'content'=>'required',
+            'due'=>'required'
+        ]);
+
+        Todo::create($valadter);
+
+        return redirect('/')->with('success','Successful Insert');
     }
 
     /**
@@ -45,7 +59,8 @@ class TodoListController extends Controller
      */
     public function show($id)
     {
-        //
+        $todo = Todo::find($id);
+        return view('show',compact('todo'));
     }
 
     /**
@@ -55,8 +70,9 @@ class TodoListController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
+    {   
+        $todo = Todo::find($id);
+        return view('edit',compact('todo'));
     }
 
     /**
@@ -68,7 +84,15 @@ class TodoListController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $valadter = $request->validate([
+            'title'=>'required',
+            'content'=>'required',
+            'due'=>'required'
+        ]);
+
+        $todo = Todo::find($id);
+        $todo->update($valadter);
+        return redirect('/')->with('success','Successful Update');
     }
 
     /**
